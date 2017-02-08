@@ -32,7 +32,7 @@ Licensed under the WTFPL license.
   }
   function getNextValue(i) { return baseReverseDic[input.charAt(i)]; }
 
-  doc.scripts[0].remove();
+  // doc.scripts[doc.scripts.length - 1].remove();
 
 
 	for (i = 0; i < 3; i += 1) {
