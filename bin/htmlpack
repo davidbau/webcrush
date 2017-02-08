@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+
+var HtmlMinifier = require('html-minifier');
+var LzString = require('lz-string');
+var args = process.argv.slice(2);
+
+if (args.length > 1) {
+  console.log('Usage: htmlpack [filename.html]');
+  process.exit(0);
+}
+if (args.length == 1) {
+  var fs = require('fs');
+  fs.readFile(args[0], 'utf-8', function(err, data) {
+    if (err) throw err;
+    dopack(data);
+  });
+} else {
+  var data = '';
+  process.stdin.resume();
+  process.stdin.setEncoding('utf-8');
+  process.stdin.on('data', function(buf) { data += buf.toString(); });
+  process.stdin.on('end', function() {
+    dopack(data);
+  });
+}
+
+
+function dopack(text) {
+  var minified = HtmlMinifier.minify(text, {
+    html5: true,
+    collapseWhitespace: true,
+    conservativeCollapse: true,
+    minifyJS: { mangle: { toplevel: true } },
+    removeComments: true,
+    keepClosingSlash: true,
+    removeAttributeQuotes: true
+  });
+  var prefix = minified.match(
+    /^(?:\s*<!doctype\s*html\s*>)?(?:\s*<html[^>]*>)?(?:\s*<head[^>]*>)?/);
+  prefix = prefix ? prefix[0] : '';
+  compressed = LzString.compressToBase64(minified.substr(prefix.length));
+  process.stdout.write('<script src=https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js>' + compressed + '</script><script>document.write(LZString.decompressFromBase64(document.scripts[0].textContent))</script>');
+}
+
