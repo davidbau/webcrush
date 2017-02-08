@@ -1,5 +1,5 @@
 {
-  "name": "htmlpack",
+  "name": "webcrush",
   "version": "0.0.1",
   "description": "utility to minify, obfuscate, and compress HTML",
   "bin": "bin/htmlpack",
