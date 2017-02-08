@@ -26,20 +26,23 @@ if (args.length == 1) {
 
 
 function dopack(text) {
+  // Step 1: minify the HTML code and minify inline JS and CSS
   var minified = HtmlMinifier.minify(text, {
     html5: true,
     collapseWhitespace: true,
     conservativeCollapse: true,
     minifyJS: { mangle: { toplevel: true } },
+    minifyCSS: true,
     removeComments: true,
     keepClosingSlash: true,
     removeAttributeQuotes: true
   });
+  // Step 2: exempt doctype, html, head start-tags from compression.
   var prefix = minified.match(
     /^(?:\s*<!doctype\s*html\s*>)?(?:\s*<html[^>]*>)?(?:\s*<head[^>]*>)?/);
   prefix = prefix ? prefix[0] : '';
+  // Step 3: compress the remainder of the minified text.
   compressed = LzString.compressToBase64(minified.substr(prefix.length));
-  process.stdout.write('<script>/*' + compressed + '*/' +
-  '!function(){function r(r,e,t){var a,c,n,o,i,v,f,s,h=[],u=4,m=4,b=3,l="",k=[],w=Math.pow,A={v:t(0),p:e,i:1};for(c=0;3>c;c+=1)h[c]=c;for(o=0,v=w(2,2),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;switch(a=o){case 0:for(o=0,v=w(2,8),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;s=p(o);break;case 1:for(o=0,v=w(2,16),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;s=p(o);break;case 2:return""}for(h[3]=s,n=s,k.push(s);;){if(A.i>r)return"";for(o=0,v=w(2,b),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;switch(s=o){case 0:for(o=0,v=w(2,8),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;h[m++]=p(o),s=m-1,u--;break;case 1:for(o=0,v=w(2,16),f=1;f!=v;)i=A.v&A.p,A.p>>=1,0==A.p&&(A.p=e,A.v=t(A.i++)),o|=(i>0?1:0)*f,f<<=1;h[m++]=p(o),s=m-1,u--;break;case 2:return k.join("")}0==u&&(u=w(2,b),b++),h[s]?l=h[s]:s===m&&(l=n+n.charAt(0)),k.push(l),h[m++]=n+l.charAt(0),u--,n=l,0==u&&(u=w(2,b),b++)}}for(var p=String.fromCharCode,e=document.scripts[0],t=e.text.substr(2).replace(/\\*.*$/,""),a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",c={},n=0;n<a.length;n++)c[a.charAt(n)]=n;e.parentElement.removeChild(e),document.write(r(t.length,32,function(r){return c[t.charAt(r)]}))}();</script>');
+  // Step 4: wrap it in an LZW decompression script.
+  process.stdout.write('<script>!function(p){function r(r){return w[p.charAt(r)]}var o,e,i,t,v,a,c,f,h=String.fromCharCode,s=document,n=32,u="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",w={},A=[],b=4,d=4,k=3,m="",g=[],C=Math.pow,j={v:r(0),p:n,i:1};for(e=0;e<u.length;e++)w[u.charAt(e)]=e;for(s.scripts[0].remove(),e=0;3>e;e+=1)A[e]=e;for(t=0,a=C(2,2),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;switch(o=t){case 0:for(t=0,a=C(2,8),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;f=h(t);break;case 1:for(t=0,a=C(2,16),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;f=h(t)}for(A[3]=f,i=f,g.push(f);;){for(t=0,a=C(2,k),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;switch(f=t){case 0:for(t=0,a=C(2,8),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;A[d++]=h(t),f=d-1,b--;break;case 1:for(t=0,a=C(2,16),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;A[d++]=h(t),f=d-1,b--;break;case 2:return void s.write(g.join(""))}0==b&&(b=C(2,k),k++),A[f]?m=A[f]:f===d&&(m=i+i.charAt(0)),g.push(m),A[d++]=i+m.charAt(0),b--,i=m,0==b&&(b=C(2,k),k++)}}("' + compressed + '");</script>');
 }
-

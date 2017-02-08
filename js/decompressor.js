@@ -1,7 +1,19 @@
-(function() {
+/*
+Decompressor derived from LZ-String, with unused code removed.
+Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+Licensed under the WTFPL license.
+*/
+(function(input) {
+  var f = String.fromCharCode,
+      doc = document,
+      /*length = input.length, */
+      resetValue = 32,
+      keyStrBase64 =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+      baseReverseDic = {},
 
-function _decompress(length, resetValue, getNextValue) {
-	var dictionary = [],
+  // Original decompress starts here.
+	    dictionary = [],
 			next,
 			enlargeIn = 4,
 			dictSize = 4,
@@ -14,6 +26,14 @@ function _decompress(length, resetValue, getNextValue) {
 			bits, resb, maxpower, power,
 			c,
 			data = {v:getNextValue(0), p:resetValue, i:1};
+
+  for (i = 0; i < keyStrBase64.length ; i++) {
+    baseReverseDic[keyStrBase64.charAt(i)] = i;
+  }
+  function getNextValue(i) { return baseReverseDic[input.charAt(i)]; }
+
+  doc.scripts[0].remove();
+
 
 	for (i = 0; i < 3; i += 1) {
 		dictionary[i] = i;
@@ -66,16 +86,20 @@ function _decompress(length, resetValue, getNextValue) {
 				}
 			c = f(bits);
 			break;
+    /* Should not happen
 		case 2:
 			return "";
+    */
 	}
 	dictionary[3] = c;
 	w = c;
 	result.push(c);
 	while (true) {
+    /* Should not happen
 		if (data.i > length) {
 			return "";
 		}
+    */
 
 		bits = 0;
 		maxpower = mpow(2,numBits);
@@ -130,7 +154,9 @@ function _decompress(length, resetValue, getNextValue) {
 				enlargeIn--;
 				break;
 			case 2:
-				return result.join('');
+        /* when done, generate a document with the result. */
+				doc.write(result.join(''));
+        return;
 		}
 
 		if (enlargeIn == 0) {
@@ -143,10 +169,10 @@ function _decompress(length, resetValue, getNextValue) {
 		} else {
 			if (c === dictSize) {
 				entry = w + w.charAt(0);
-			} else {
-        // Should not happen.
-				// return null;
-			}
+			} /* Should not happen else {
+       
+				return null;
+			} */
 		}
 		result.push(entry);
 
@@ -162,20 +188,5 @@ function _decompress(length, resetValue, getNextValue) {
 		}
 
 	}
-}
 
-// Now decompress
-var f = String.fromCharCode,
-    script = document.scripts[0],
-    input = script.text.substr(2).replace(/\*.*$/,''),
-    keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-    baseReverseDic = {};
-
-for (var i = 0; i < keyStrBase64.length ; i++) {
-  baseReverseDic[keyStrBase64.charAt(i)] = i;
-}
-
-script.parentElement.removeChild(script);
-document.write(_decompress(input.length, 32, function(i) { return baseReverseDic[input.charAt(i)]; }));
-
-})();
+})('');
