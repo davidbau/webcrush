@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>Webcrush</title>
+<link rel="stylesheet" href=
+  "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.css">
+<script src=
+  "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="js/webcrush.js"></script>
+<style>
+textarea { font: 8pt monospace; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Webcrush HTML compressor and obfuscator</h2>
+      <p>Paste your HTML here to minify the markup, inline JS and CSS,
+      and <input type="checkbox" id="lz" checked> apply LZ compression.
+      <center>
+        <input type="button" value="Crush it!" id="go" class="btn btn-primary">
+      </center>
+      </p>
+      <textarea id="code" style="height:80vh;width:100%"></textarea>
+    </div>
+  </div> <!-- class="row" -->
+</div> <!-- class="container" -->
+
+</body>
+
+</html>
+
+<script>
+$(document).on('click', '#go', function() {
+  var uncrushed = $('#code').val();
+  if (!uncrushed) {
+    return;
+  }
+  var crushed = webcrush.packhtml(uncrushed, {
+    lzCompress: $('#lz').prop('checked')
+  });
+  // If already compressed and getting longer, then don't crush.
+  if (uncrushed.length < crushed.length &&
+      uncrushed.indexOf(webcrush.decompressor) >= 0) {
+    crushed = uncrushed;
+  }
+  $('#code').val(crushed).select();
+});
+</script>
+

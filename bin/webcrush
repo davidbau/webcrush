@@ -1,18 +1,13 @@
 #!/usr/bin/env node
 
-var HtmlMinifier = require('html-minifier');
-var LzString = require('lz-string');
-var args = process.argv.slice(2);
+var webcrush = require('../');
+var args = require('yargs').config().demandCommand(0, 1).argv;
 
-if (args.length > 1) {
-  console.log('Usage: htmlpack [filename.html]');
-  process.exit(0);
-}
-if (args.length == 1) {
+if (args._.length == 1) {
   var fs = require('fs');
-  fs.readFile(args[0], 'utf-8', function(err, data) {
+  fs.readFile(args._[0], 'utf-8', function(err, data) {
     if (err) throw err;
-    dopack(data);
+    process.stdout.write(webcrush.packhtml(data, args));
   });
 } else {
   var data = '';
@@ -20,43 +15,6 @@ if (args.length == 1) {
   process.stdin.setEncoding('utf-8');
   process.stdin.on('data', function(buf) { data += buf.toString(); });
   process.stdin.on('end', function() {
-    dopack(data);
+    process.stdout.write(webcrush.packhtml(text, args));
   });
-}
-
-
-function dopack(text) {
-  // Step 1: minify the HTML code and minify inline JS and CSS
-  var minified = HtmlMinifier.minify(text, {
-    html5: true,
-    collapseWhitespace: true,
-    conservativeCollapse: true,
-    minifyJS: { mangle: { toplevel: true } },
-    minifyCSS: true,
-    removeComments: true,
-    keepClosingSlash: true,
-    removeAttributeQuotes: true
-  });
-  // Step 2: exempt doctype, html, head start-tags from compression.
-  var prefix = minified.match(
-    /^(?:\s*<!doctype\s*html\s*>)?(?:\s*<html[^>]*>)?(?:\s*<head[^>]*>)?/i);
-  prefix = prefix ? prefix[0] : '';
-  var suffix = minified.substr(prefix.length);
-  // Step 3: find all the offdomain scripts (odd-indexed entries in chopped).
-  if (true) {
-    var chopped = suffix.split(/(\s?<script src="?http[^>]*><\/script>)/i);
-    suffix = '';
-    for (var j = 0; j < chopped.length; j++) {
-      if (j % 2) {
-        prefix += chopped[j];
-      } else {
-        suffix += chopped[j];
-      }
-    }
-  }
-  prefix = prefix.replace(/ </g, '<');
-  // Step 4: compress the remainder of the minified text.
-  compressed = LzString.compressToBase64(suffix);
-  // Step 5: wrap it in an LZW decompression script.
-  process.stdout.write(prefix + '<script>!function(p){function r(r){return w[p.charAt(r)]}var o,e,i,t,v,a,c,f,h=String.fromCharCode,s=document,n=32,u="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",w={},A=[],b=4,d=4,k=3,m="",g=[],C=Math.pow,j={v:r(0),p:n,i:1};for(e=0;e<u.length;e++)w[u.charAt(e)]=e;for(e=0;3>e;e+=1)A[e]=e;for(t=0,a=C(2,2),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;switch(o=t){case 0:for(t=0,a=C(2,8),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;f=h(t);break;case 1:for(t=0,a=C(2,16),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;f=h(t)}for(A[3]=f,i=f,g.push(f);;){for(t=0,a=C(2,k),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;switch(f=t){case 0:for(t=0,a=C(2,8),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;A[d++]=h(t),f=d-1,b--;break;case 1:for(t=0,a=C(2,16),c=1;c!=a;)v=j.v&j.p,j.p>>=1,0==j.p&&(j.p=n,j.v=r(j.i++)),t|=(v>0?1:0)*c,c<<=1;A[d++]=h(t),f=d-1,b--;break;case 2:return void s.write(g.join(""))}0==b&&(b=C(2,k),k++),A[f]?m=A[f]:f===d&&(m=i+i.charAt(0)),g.push(m),A[d++]=i+m.charAt(0),b--,i=m,0==b&&(b=C(2,k),k++)}}("' + compressed + '");</script>');
 }
