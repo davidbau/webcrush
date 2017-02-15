@@ -32,7 +32,7 @@ Note that crushing is not good for hiding serious secrets in HTML,
 because it is not difficult to decompress and reveal the code.
 Also, crushing can grow short documents, because the code is
 expressed in base64 (which grows 25%) and LZ decompression code
-must be packaged in the document (which adds 483 bytes). It
+must be packaged in the document (which adds 473 bytes). It
 is better to rely on HTTP gzip encoding for saving bandwidth.
 
 ## Credits

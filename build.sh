@@ -14,3 +14,7 @@ node_modules/uglifyjs/bin/uglifyjs js/decompressor.js -c -m | \
 # Browserify webcrush to create an HTML version of the utility.
 echo 'Browserifying webcrush.js'
 node_modules/browserify/bin/cmd.js lib/webcrush.js -o js/webcrush.js
+
+# Crush webcrush itself, as a test.
+echo 'Crushing webcrush'
+bin/webcrush webcrush.html > crushed.html

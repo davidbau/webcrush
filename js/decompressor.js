@@ -34,15 +34,14 @@
           power = 1;
       while (power != maxpower) {
         // Extract the bits from the current base64 char, one bit at a time.
-        var resb = data_val & data_position;
+        bits |= (data_val & data_position) && power;
+        power *= 2;
         data_position >>= 1;
         if (data_position == 0) {
           // Advance to the next base64 char once bits are exhausted.
           data_position = 32;
           data_val = base64Lookup[input[data_index++]];
         }
-        bits |= (resb && power);
-        power <<= 1;
       }
       return bits;
     }
@@ -69,7 +68,7 @@
     // Initialize base64Lookup, which maps each char to its index in
     // "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     while (--c >= 0) {
-      base64Lookup[charFor(c > 61 ? (c & 1) * 4 | 43 // 62 -> '+', 63 -> '/'
+      base64Lookup[charFor(c > 61 ? (c & 1) * 4 + 43 // 62 -> '+', 63 -> '/'
         : c + [65, 71, -4][c / 26 & 3])] = c; // 0 -> 'A', 26 -> 'a', 52 -> '0'
     }
     // Prime the buffer.
