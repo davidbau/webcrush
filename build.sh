@@ -6,8 +6,8 @@ node_modules/uglifyjs/bin/uglifyjs js/decompressor.js -c -m | \
   sed 's/("");$//' | sed 's/^!//' | \
   fold -w 70 | \
   sed "s/^/    '/" | sed "$ ! s/$/' +/" | sed "$ s/$/' \/* end *\/\n/" | \
-  sed -e "/'!function(/r /dev/stdin" \
-      -e "/'!function(/,/}' \/\* end \*\//d" \
+  sed -e "/'function(/r /dev/stdin" \
+      -e "/'function(/,/}' \/\* end \*\//d" \
       -i lib/webcrush.js
 
 # Browserify webcrush to create an HTML version of the utility.

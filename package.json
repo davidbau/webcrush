@@ -1,6 +1,6 @@
 {
   "name": "webcrush",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "utility to minify, obfuscate, and compress HTML",
   "bin": "bin/webcrush",
   "main": "lib/webcrush.js",
