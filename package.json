@@ -1,17 +1,16 @@
 {
   "name": "webcrush",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "utility to minify, obfuscate, and compress HTML",
   "bin": "bin/webcrush",
   "main": "lib/webcrush.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":
-      "node_modules/browserify/bin/cmd.js lib/webcrush.js -o js/webcrush.js"
+    "build": "./build.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidbau/htmlpack.git"
+    "url": "git+https://github.com/davidbau/webcrush.git"
   },
   "keywords": [
     "minify",
