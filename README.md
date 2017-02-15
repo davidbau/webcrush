@@ -1,5 +1,5 @@
 Webcrush
---------
+========
 
 Webcrush is a simple utility for minifying and compressing HTML.
 
